@@ -5,7 +5,7 @@ import reduce from './reducers'
 import {
   updateRecord,
   setEditable,
-  save,
+  SAVE,
   saveFailure,
   saveSuccess
 } from './actions'
@@ -35,7 +35,7 @@ test('reflects the saving state', t => {
     record: null
   }
   const record = { data: { _new: 1 } }
-  const savingState = reduce(state, save())
+  const savingState = reduce(state, { type: SAVE })
   t.is(isSaving(savingState), true)
   const failureState = reduce(savingState, saveFailure())
   t.is(isSaving(failureState), false)

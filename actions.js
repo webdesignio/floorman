@@ -1,3 +1,8 @@
+/* global fetch, location, Headers */
+
+import { parse } from 'url'
+import 'whatwg-fetch'
+
 export const UPDATE_RECORD = 'UPDATE_RECORD'
 export const SET_EDITABLE = 'SET_EDITABLE'
 export const SAVE = 'SAVE'
@@ -13,7 +18,24 @@ export function setEditable (value) {
 }
 
 export function save () {
-  return { type: SAVE }
+  const { pathname } = parse(location.href)
+  const putLocation = pathname === '/'
+    ? '/index'
+    : pathname
+  return (dispatch, getState) => {
+    dispatch({ type: SAVE })
+    const { record } = getState()
+    fetch(putLocation, {
+      method: 'PUT',
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      }),
+      body: JSON.stringify(record)
+    })
+    .then(res => res.json())
+    .then(record => dispatch(saveSuccess(record)))
+    .catch(e => dispatch(saveFailure(e)))
+  }
 }
 
 export function saveSuccess (record) {

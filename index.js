@@ -1,9 +1,14 @@
-import { createStore as createReduxStore } from 'redux'
+import { createStore as createReduxStore, applyMiddleware } from 'redux'
+import thunk from 'redux-thunk'
 
 import reduce from './reducers'
 
 export function createStore ({ record }) {
-  const store = createReduxStore(reduce, { originalRecord: record, record })
+  const store = createReduxStore(
+    reduce,
+    { originalRecord: record, record },
+    applyMiddleware(thunk)
+  )
   return store
 }
 
