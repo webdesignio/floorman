@@ -1,5 +1,5 @@
 {
-  "name": "webdesignio-floorman",
+  "name": "@webdesignio/floorman",
   "version": "0.0.0",
   "main": "index.js",
   "scripts": {
