@@ -9,7 +9,12 @@ import {
   saveFailure,
   saveSuccess
 } from './actions'
-import { recordData, isEditable, isSaving } from './selectors'
+import {
+  createValueSelector,
+  recordData,
+  isEditable,
+  isSaving
+} from './selectors'
 
 test('updates record data', t => {
   const state = {
@@ -19,6 +24,8 @@ test('updates record data', t => {
   const action = updateRecord(update)
   const newState = reduce(state, action)
   t.deepEqual(recordData(newState), {... state.record.data, ... update})
+  t.is(createValueSelector('title')(newState), update.title)
+  t.is(createValueSelector('foo')(newState), update.foo)
 })
 
 test('toggles the editable flag', t => {
