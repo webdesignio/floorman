@@ -2,6 +2,7 @@ import { combineReducers } from 'redux'
 
 import {
   UPDATE_RECORD,
+  UPDATE_GLOBALS,
   SET_EDITABLE,
   SAVE,
   SAVE_SUCCESS,
@@ -11,6 +12,7 @@ import {
 export default combineReducers({
   originalRecord,
   record,
+  globals,
   isEditable,
   isSaving
 })
@@ -32,6 +34,15 @@ function record (state = null, action) {
       return Object.assign({}, state, {
         data: Object.assign({}, state.data, action.update)
       })
+    default:
+      return state
+  }
+}
+
+function globals (state = null, action) {
+  switch (action.type) {
+    case UPDATE_GLOBALS:
+      return Object.assign({}, state, action.update)
     default:
       return state
   }

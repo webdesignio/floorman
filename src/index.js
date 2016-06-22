@@ -3,12 +3,14 @@ import thunk from 'redux-thunk'
 
 import reduce from './reducers'
 
-export function createStore ({ record }) {
+export function createStore ({ globals, record }) {
   const store = createReduxStore(
     reduce,
-    { originalRecord: record, record },
+    { originalRecord: record, record, globals },
     applyMiddleware(thunk)
   )
+  console.log(globals)
+  console.log('state', store.getState())
   return store
 }
 

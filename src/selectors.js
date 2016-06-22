@@ -1,8 +1,14 @@
 import { createSelector } from 'reselect'
 
-export function recordData ({ record: { data } }) {
-  return data
-}
+export const recordData = createSelector(
+  ({ record: { data } }) => data,
+  data => data || {}
+)
+
+export const globals = createSelector(
+  ({ globals }) => globals,
+  globals => globals || {}
+)
 
 export function isEditable ({ isEditable }) {
   return isEditable
@@ -15,6 +21,10 @@ export function isSaving ({ isSaving }) {
 export function createValueSelector (name) {
   return createSelector(
     recordData,
-    ({ [name]: value }) => value
+    globals,
+    (recordData, globals) =>
+      Object.keys(globals).indexOf(name) !== -1
+        ? globals[name]
+        : recordData[name]
   )
 }
