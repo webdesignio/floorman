@@ -9,8 +9,6 @@ export function createStore ({ globals, record }) {
     { originalRecord: record, record, globals },
     applyMiddleware(thunk)
   )
-  console.log(globals)
-  console.log('state', store.getState())
   return store
 }
 
