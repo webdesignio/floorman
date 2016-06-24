@@ -22,33 +22,41 @@ import {
 
 test('updates record data', t => {
   const state = {
+    currentLanguage: 'en',
     record: { data: {} }
   }
-  const update = { title: 'test', foo: ['bar'] }
+  const update = { title: { values: { en: 'test' } }, foo: { values: { en: ['bar'] } } }
   const action = updateRecord(update)
   const newState = reduce(state, action)
   t.deepEqual(recordData(newState), Object.assign({}, state.record.data, update))
-  t.is(createValueSelector('title')(newState), update.title)
-  t.is(createValueSelector('foo')(newState), update.foo)
+  t.is(createValueSelector('title')(newState), update.title.values.en)
+  t.is(createValueSelector('foo')(newState), update.foo.values.en)
 })
 
 test('updates global data', t => {
   const state = {
+    currentLanguage: 'en',
     globals: { title: '' },
     record: { data: {} }
   }
-  const update = { title: 'test', foo: ['bar'] }
+  const update = { title: { values: { en: 'test' } }, foo: { values: { en: ['bar'] } } }
   const action = updateGlobals(update)
   const newState = reduce(state, action)
   t.deepEqual(globals(newState), Object.assign({}, state.globals, update))
-  t.is(createValueSelector('title')(newState), update.title)
-  t.is(createValueSelector('foo')(newState), update.foo)
+  t.is(createValueSelector('title')(newState), update.title.values.en)
+  t.is(createValueSelector('foo')(newState), update.foo.values.en)
   t.is(newState.globals.title, update.title)
 })
 
 test('updates both globals and record data', t => {
   const state = {
-    globals: { title: '', foo: null },
+    defaultLanguage: 'en',
+    languages: ['en', 'de'],
+    currentLanguage: 'de',
+    globals: {
+      title: { values: { en: 'Fooish stuff' } },
+      foo: { values: {} }
+    },
     record: { data: {} }
   }
   const updateData = { title: 'test', foo: [], bar: 42 }
@@ -58,8 +66,24 @@ test('updates both globals and record data', t => {
   const action = update(updateData)
   action(dispatch, getState)
   t.truthy(dispatch.calledTwice)
-  t.deepEqual(dispatch.args[0][0], updateRecord({ bar }))
-  t.deepEqual(dispatch.args[1][0], updateGlobals({ title, foo }))
+  t.deepEqual(
+    dispatch.args[0][0],
+    updateRecord({ bar: { values: { [state.currentLanguage]: bar } } })
+  )
+  t.deepEqual(
+    dispatch.args[1][0],
+    updateGlobals({
+      title: {
+        values: {
+          [state.currentLanguage]: title,
+          en: state.globals.title.values.en
+        }
+      },
+      foo: {
+        values: { [state.currentLanguage]: foo }
+      }
+    })
+  )
 })
 
 test('toggles the editable flag', t => {

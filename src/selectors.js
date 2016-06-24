@@ -10,6 +10,8 @@ export const globals = createSelector(
   globals => globals || {}
 )
 
+export const currentLanguage = ({ currentLanguage }) => currentLanguage
+
 export function isEditable ({ isEditable }) {
   return isEditable
 }
@@ -22,9 +24,15 @@ export function createValueSelector (name) {
   return createSelector(
     recordData,
     globals,
-    (recordData, globals) =>
+    currentLanguage,
+    (recordData, globals, currentLanguage) =>
       Object.keys(globals).indexOf(name) !== -1
-        ? globals[name]
-        : recordData[name]
+        ? extractField({ currentLanguage }, globals[name])
+        : extractField({ currentLanguage }, recordData[name])
   )
+}
+
+function extractField ({ currentLanguage }, field = {}) {
+  const values = field.values || {}
+  return values[currentLanguage]
 }

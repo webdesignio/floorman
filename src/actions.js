@@ -3,7 +3,7 @@
 import { parse } from 'url'
 import 'whatwg-fetch'
 
-import { globals } from './selectors'
+import { globals, recordData, currentLanguage } from './selectors'
 
 export const UPDATE_RECORD = 'UPDATE_RECORD'
 export const UPDATE_GLOBALS = 'UPDATE_GLOBALS'
@@ -22,7 +22,8 @@ export function updateGlobals (update) {
 
 export function update (update) {
   return (dispatch, getState) => {
-    const globalKeys = Object.keys(globals(getState()))
+    const state = getState()
+    const globalKeys = Object.keys(globals(state))
     const updates = Object.keys(update)
       .map(key =>
         globalKeys.indexOf(key) !== -1
@@ -45,12 +46,35 @@ export function update (update) {
         {}
       )
     if (updates.local) {
-      dispatch(updateRecord(updates.local))
+      const opts = {
+        currentLanguage: currentLanguage(state),
+        fields: recordData(state)
+      }
+      dispatch(updateRecord(spreadToLanguage(opts, updates.local)))
     }
     if (updates.global) {
-      dispatch(updateGlobals(updates.global))
+      const opts = {
+        currentLanguage: currentLanguage(state),
+        fields: globals(state)
+      }
+      dispatch(updateGlobals(spreadToLanguage(opts, updates.global)))
     }
   }
+}
+
+function spreadToLanguage ({ currentLanguage, fields }, update) {
+  return Object.keys(update)
+    .reduce(
+      (updates, key) =>
+        Object.assign({}, updates, {
+          [key]: {
+            values: Object.assign({}, (fields[key] || {}).values, {
+              [currentLanguage]: update[key]
+            })
+          }
+        }),
+      {}
+    )
 }
 
 export function setEditable (value) {
