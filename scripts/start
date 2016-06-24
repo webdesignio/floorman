@@ -1,4 +1,5 @@
 #!/bin/bash
 
 echo "  Start watcher"
-watch-run -i -p 'src/**,!src/*_test.js' scripts/build
+watch-run -i -p 'src/**,!src/*_test.js' scripts/build 2>&1 >/dev/null &
+ava --watch

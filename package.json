@@ -8,8 +8,11 @@
     "prepublish": "scripts/build"
   },
   "ava": {
+    "source": [
+      "src/*.js"
+    ],
     "files": [
-      "**/*_test.js"
+      "src/*_test.js"
     ]
   },
   "keywords": [],
