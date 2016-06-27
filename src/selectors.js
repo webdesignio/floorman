@@ -10,7 +10,13 @@ export const globals = createSelector(
   globals => globals || {}
 )
 
-export const currentLanguage = ({ currentLanguage }) => currentLanguage
+export const currentLanguage = createSelector(
+  ({ currentLanguage }) => currentLanguage,
+  ({ defaultLanguage }) => defaultLanguage,
+  ({ languages }) => languages[0],
+  (currentLanguage, defaultLanguage, firstLanguage) =>
+    currentLanguage || defaultLanguage || firstLanguage
+)
 
 export const languages = ({ languages }) => languages
 
