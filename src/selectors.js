@@ -40,7 +40,7 @@ export function createValueSelector (name) {
   )
 }
 
-function extractField ({ currentLanguage }, field = {}) {
-  const values = field.values || {}
+function extractField ({ currentLanguage }, field) {
+  const values = (field || {}).values || {}
   return values[currentLanguage]
 }
