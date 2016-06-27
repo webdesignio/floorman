@@ -3,10 +3,11 @@ import thunk from 'redux-thunk'
 
 import reduce from './reducers'
 
-export function createStore ({ globals, record }) {
+export function createStore (initialState) {
+  const { record } = initialState
   const store = createReduxStore(
     reduce,
-    { originalRecord: record, record, globals },
+    Object.assign({}, initialState, { originalRecord: record }),
     applyMiddleware(thunk)
   )
   return store
