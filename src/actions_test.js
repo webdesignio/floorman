@@ -10,14 +10,17 @@ import {
   setEditable,
   SAVE,
   saveFailure,
-  saveSuccess
+  saveSuccess,
+  switchLanguage
 } from './actions'
 import {
   createValueSelector,
   recordData,
   globals,
   isEditable,
-  isSaving
+  isSaving,
+  currentLanguage,
+  languages
 } from './selectors'
 
 test('updates record data', t => {
@@ -107,4 +110,15 @@ test('reflects the saving state', t => {
   const successState = reduce(savingState, saveSuccess(record))
   t.is(isSaving(successState), false)
   t.is(recordData(successState), record.data)
+})
+
+test('switches the language', t => {
+  const state = {
+    defaultLanguage: 'en',
+    languages: ['de', 'en', 'fr'],
+    currentLanguage: 'de'
+  }
+  const frLangState = reduce(state, switchLanguage('fr'))
+  t.is(currentLanguage(frLangState), 'fr')
+  t.is(languages(state), state.languages)
 })

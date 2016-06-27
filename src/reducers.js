@@ -6,7 +6,8 @@ import {
   SET_EDITABLE,
   SAVE,
   SAVE_SUCCESS,
-  SAVE_FAILURE
+  SAVE_FAILURE,
+  SWITCH_LANGUAGE
 } from './actions'
 
 export default combineReducers({
@@ -66,7 +67,9 @@ function defaultLanguage (state = null, action) {
 }
 
 function currentLanguage (state = null, action) {
-  switch (action.typ) {
+  switch (action.type) {
+    case SWITCH_LANGUAGE:
+      return action.lang
     default:
       return state
   }

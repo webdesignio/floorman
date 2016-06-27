@@ -11,6 +11,7 @@ export const SET_EDITABLE = 'SET_EDITABLE'
 export const SAVE = 'SAVE'
 export const SAVE_SUCCESS = 'SAVE_SUCCESS'
 export const SAVE_FAILURE = 'SAVE_FAILURE'
+export const SWITCH_LANGUAGE = 'SWITCH_LANGUAGE'
 
 export function updateRecord (update) {
   return { type: UPDATE_RECORD, update }
@@ -108,4 +109,8 @@ export function saveSuccess (record) {
 
 export function saveFailure () {
   return { type: SAVE_FAILURE }
+}
+
+export function switchLanguage (lang) {
+  return { type: SWITCH_LANGUAGE, lang }
 }

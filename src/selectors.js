@@ -12,6 +12,8 @@ export const globals = createSelector(
 
 export const currentLanguage = ({ currentLanguage }) => currentLanguage
 
+export const languages = ({ languages }) => languages
+
 export function isEditable ({ isEditable }) {
   return isEditable
 }
