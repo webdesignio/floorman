@@ -90,7 +90,7 @@ export function save () {
   return (dispatch, getState) => {
     dispatch({ type: SAVE })
     const { globals, record } = getState()
-    fetch(putLocation, {
+    fetch(putLocation.replace(/\/new$/, `/${record._id}`), {
       method: 'PUT',
       headers: new Headers({
         'Content-Type': 'application/json'
