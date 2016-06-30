@@ -60,7 +60,8 @@ test('updates both globals and record data', t => {
       title: { values: { en: 'Fooish stuff' } },
       foo: { values: {} }
     },
-    record: { data: {} }
+    record: { data: {} },
+    noLangFields: []
   }
   const updateData = { title: 'test', foo: [], bar: 42 }
   const { title, foo, bar } = updateData
@@ -121,4 +122,18 @@ test('switches the language', t => {
   const frLangState = reduce(state, switchLanguage('fr'))
   t.is(currentLanguage(frLangState), 'fr')
   t.is(languages(state), state.languages)
+})
+
+test('updates no-lang fields properly', t => {
+  let state = {
+    defaultLanguage: 'en',
+    languages: ['de', 'en', 'fr'],
+    currentLanguage: 'de',
+    noLangFields: ['logo'],
+    record: { data: {} }
+  }
+  const dispatch = action => (state = reduce(state, action))
+  update({ logo: 'my value' })(dispatch, () => state)
+  t.is(createValueSelector('logo')(state), 'my value')
+  t.deepEqual(state.record.data.logo, { value: 'my value' })
 })

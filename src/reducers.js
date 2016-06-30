@@ -14,6 +14,7 @@ export default combineReducers({
   originalRecord,
   record,
   globals,
+  noLangFields,
   languages,
   defaultLanguage,
   currentLanguage,
@@ -47,6 +48,13 @@ function globals (state = null, action) {
   switch (action.type) {
     case UPDATE_GLOBALS:
       return Object.assign({}, state, action.update)
+    default:
+      return state
+  }
+}
+
+function noLangFields (state = [], action) {
+  switch (action.type) {
     default:
       return state
   }

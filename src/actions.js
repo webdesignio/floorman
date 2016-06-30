@@ -3,7 +3,12 @@
 import { parse } from 'url'
 import 'whatwg-fetch'
 
-import { globals, recordData, currentLanguage } from './selectors'
+import {
+  globals,
+  recordData,
+  currentLanguage,
+  noLangFields
+} from './selectors'
 
 export const UPDATE_RECORD = 'UPDATE_RECORD'
 export const UPDATE_GLOBALS = 'UPDATE_GLOBALS'
@@ -49,31 +54,39 @@ export function update (update) {
     if (updates.local) {
       const opts = {
         currentLanguage: currentLanguage(state),
-        fields: recordData(state)
+        fields: recordData(state),
+        noLangFields: noLangFields(state)
       }
       dispatch(updateRecord(spreadToLanguage(opts, updates.local)))
     }
     if (updates.global) {
       const opts = {
         currentLanguage: currentLanguage(state),
-        fields: globals(state)
+        fields: globals(state),
+        noLangFields: noLangFields(state)
       }
       dispatch(updateGlobals(spreadToLanguage(opts, updates.global)))
     }
   }
 }
 
-function spreadToLanguage ({ currentLanguage, fields }, update) {
+function spreadToLanguage ({ currentLanguage, noLangFields, fields }, update) {
   return Object.keys(update)
     .reduce(
       (updates, key) =>
-        Object.assign({}, updates, {
-          [key]: {
-            values: Object.assign({}, (fields[key] || {}).values, {
-              [currentLanguage]: update[key]
-            })
-          }
-        }),
+        noLangFields.indexOf(key) === -1
+          ? Object.assign({}, updates, {
+            [key]: {
+              values: Object.assign({}, (fields[key] || {}).values, {
+                [currentLanguage]: update[key]
+              })
+            }
+          })
+          : Object.assign({}, updates, {
+            [key]: {
+              value: update[key]
+            }
+          }),
       {}
     )
 }

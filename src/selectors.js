@@ -10,6 +10,8 @@ export const globals = createSelector(
   globals => globals || {}
 )
 
+export const noLangFields = ({ noLangFields }) => noLangFields
+
 export const currentLanguage = createSelector(
   ({ currentLanguage }) => currentLanguage,
   ({ defaultLanguage }) => defaultLanguage,
@@ -30,17 +32,22 @@ export function isSaving ({ isSaving }) {
 
 export function createValueSelector (name) {
   return createSelector(
+    noLangFields,
     recordData,
     globals,
     currentLanguage,
-    (recordData, globals, currentLanguage) =>
+    (noLangFields, recordData, globals, currentLanguage) =>
       Object.keys(globals).indexOf(name) !== -1
-        ? extractField({ currentLanguage }, globals[name])
-        : extractField({ currentLanguage }, recordData[name])
+        ? extractField({ currentLanguage, noLangFields }, name, globals[name])
+        : extractField({ currentLanguage, noLangFields }, name, recordData[name])
   )
 }
 
-function extractField ({ currentLanguage }, field) {
-  const values = (field || {}).values || {}
-  return values[currentLanguage]
+function extractField ({ currentLanguage, noLangFields }, name, field) {
+  if (noLangFields.indexOf(name) === -1) {
+    const values = (field || {}).values || {}
+    return values[currentLanguage]
+  } else {
+    return (field || {}).value
+  }
 }
