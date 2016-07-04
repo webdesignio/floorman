@@ -1,16 +1,17 @@
 import { createSelector } from 'reselect'
 
-export const recordData = createSelector(
-  ({ record: { data } }) => data,
+export const localFields = createSelector(
+  ({ locals: { fields } }) => fields,
   data => data || {}
 )
 
-export const globals = createSelector(
+export const globalFields = createSelector(
   ({ globals }) => globals,
-  globals => globals || {}
+  globals => (globals || {}).fields || {}
 )
 
-export const noLangFields = ({ noLangFields }) => noLangFields
+export const localNoLangFields = ({ locals: { noLangFields } }) => noLangFields
+export const globalNoLangFields = ({ globals: { noLangFields } }) => noLangFields
 
 export const currentLanguage = createSelector(
   ({ currentLanguage }) => currentLanguage,
@@ -30,16 +31,32 @@ export function isSaving ({ isSaving }) {
   return isSaving
 }
 
-export function createValueSelector (name) {
+export function createValueSelector () {
   return createSelector(
-    noLangFields,
-    recordData,
-    globals,
+    localNoLangFields,
+    globalNoLangFields,
+    localFields,
+    globalFields,
     currentLanguage,
-    (noLangFields, recordData, globals, currentLanguage) =>
-      Object.keys(globals).indexOf(name) !== -1
-        ? extractField({ currentLanguage, noLangFields }, name, globals[name])
-        : extractField({ currentLanguage, noLangFields }, name, recordData[name])
+    (state, name) => name,
+    (
+      localNoLangFields,
+      globalNoLangFields,
+      localFields,
+      globalFields,
+      currentLanguage,
+      name
+    ) => {
+      const isGlobal = Object.keys(globalFields).indexOf(name) !== -1
+      return extractField(
+        {
+          currentLanguage,
+          noLangFields: (isGlobal ? globalNoLangFields : localNoLangFields)
+        },
+        name,
+        (isGlobal ? globalFields : localFields)[name]
+      )
+    }
   )
 }
 

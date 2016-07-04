@@ -4,8 +4,8 @@ import { spy } from 'sinon'
 
 import reduce from './reducers'
 import {
-  updateRecord,
-  updateGlobals,
+  updateLocalFields,
+  updateGlobalFields,
   update,
   setEditable,
   SAVE,
@@ -15,40 +15,45 @@ import {
 } from './actions'
 import {
   createValueSelector,
-  recordData,
-  globals,
+  localFields,
+  globalFields,
   isEditable,
   isSaving,
   currentLanguage,
   languages
 } from './selectors'
 
-test('updates record data', t => {
+test('updates local data', t => {
+  const titleValue = createValueSelector()
+  const fooValue = createValueSelector()
   const state = {
     currentLanguage: 'en',
-    record: { data: {} }
+    locals: { fields: {}, noLangFields: [] },
+    globals: { noLangFields: [] }
   }
   const update = { title: { values: { en: 'test' } }, foo: { values: { en: ['bar'] } } }
-  const action = updateRecord(update)
+  const action = updateLocalFields(update)
   const newState = reduce(state, action)
-  t.deepEqual(recordData(newState), Object.assign({}, state.record.data, update))
-  t.is(createValueSelector('title')(newState), update.title.values.en)
-  t.is(createValueSelector('foo')(newState), update.foo.values.en)
+  t.deepEqual(localFields(newState), Object.assign({}, state.locals.fields, update))
+  t.is(titleValue(newState, 'title'), update.title.values.en)
+  t.is(fooValue(newState, 'foo'), update.foo.values.en)
 })
 
 test('updates global data', t => {
+  const titleValue = createValueSelector()
+  const fooValue = createValueSelector()
   const state = {
     currentLanguage: 'en',
-    globals: { title: '' },
-    record: { data: {} }
+    globals: { fields: { title: '' }, noLangFields: [] },
+    locals: { fields: {}, noLangFields: [] }
   }
   const update = { title: { values: { en: 'test' } }, foo: { values: { en: ['bar'] } } }
-  const action = updateGlobals(update)
+  const action = updateGlobalFields(update)
   const newState = reduce(state, action)
-  t.deepEqual(globals(newState), Object.assign({}, state.globals, update))
-  t.is(createValueSelector('title')(newState), update.title.values.en)
-  t.is(createValueSelector('foo')(newState), update.foo.values.en)
-  t.is(newState.globals.title, update.title)
+  t.deepEqual(globalFields(newState), Object.assign({}, state.globals.fields, update))
+  t.is(titleValue(newState, 'title'), update.title.values.en)
+  t.is(fooValue(newState, 'foo'), update.foo.values.en)
+  t.is(newState.globals.fields.title, update.title)
 })
 
 test('updates both globals and record data', t => {
@@ -57,10 +62,13 @@ test('updates both globals and record data', t => {
     languages: ['en', 'de'],
     currentLanguage: 'de',
     globals: {
-      title: { values: { en: 'Fooish stuff' } },
-      foo: { values: {} }
+      fields: {
+        title: { values: { en: 'Fooish stuff' } },
+        foo: { values: {} }
+      },
+      noLangFields: []
     },
-    record: { data: {} },
+    locals: { fields: {}, noLangFields: [] },
     noLangFields: []
   }
   const updateData = { title: 'test', foo: [], bar: 42 }
@@ -72,15 +80,15 @@ test('updates both globals and record data', t => {
   t.truthy(dispatch.calledTwice)
   t.deepEqual(
     dispatch.args[0][0],
-    updateRecord({ bar: { values: { [state.currentLanguage]: bar } } })
+    updateLocalFields({ bar: { values: { [state.currentLanguage]: bar } } })
   )
   t.deepEqual(
     dispatch.args[1][0],
-    updateGlobals({
+    updateGlobalFields({
       title: {
         values: {
           [state.currentLanguage]: title,
-          en: state.globals.title.values.en
+          en: state.globals.fields.title.values.en
         }
       },
       foo: {
@@ -101,16 +109,16 @@ test('toggles the editable flag', t => {
 test('reflects the saving state', t => {
   const state = {
     isSaving: false,
-    record: null
+    locals: {}
   }
   const record = { data: { _new: 1 } }
   const savingState = reduce(state, { type: SAVE })
   t.is(isSaving(savingState), true)
   const failureState = reduce(savingState, saveFailure())
   t.is(isSaving(failureState), false)
-  const successState = reduce(savingState, saveSuccess(record))
+  const successState = reduce(savingState, saveSuccess(record.data))
   t.is(isSaving(successState), false)
-  t.is(recordData(successState), record.data)
+  t.is(localFields(successState), record.data)
 })
 
 test('switches the language', t => {
@@ -124,16 +132,45 @@ test('switches the language', t => {
   t.is(languages(state), state.languages)
 })
 
-test('updates no-lang fields properly', t => {
+test('updates local no-lang fields properly', t => {
+  const logoValue = createValueSelector()
   let state = {
     defaultLanguage: 'en',
     languages: ['de', 'en', 'fr'],
     currentLanguage: 'de',
-    noLangFields: ['logo'],
-    record: { data: {} }
+    locals: {
+      noLangFields: ['logo'],
+      fields: {}
+    },
+    globals: {
+      noLangFields: []
+    }
   }
   const dispatch = action => (state = reduce(state, action))
   update({ logo: 'my value' })(dispatch, () => state)
-  t.is(createValueSelector('logo')(state), 'my value')
-  t.deepEqual(state.record.data.logo, { value: 'my value' })
+  t.is(logoValue(state, 'logo'), 'my value')
+  t.deepEqual(state.locals.fields.logo, { value: 'my value' })
+})
+
+test('updates global no-lang fields properly', t => {
+  const logoValue = createValueSelector()
+  let state = {
+    defaultLanguage: 'en',
+    languages: ['de', 'en', 'fr'],
+    currentLanguage: 'de',
+    locals: {
+      noLangFields: [],
+      fields: {}
+    },
+    globals: {
+      noLangFields: ['logo'],
+      fields: {
+        logo: null
+      }
+    }
+  }
+  const dispatch = action => (state = reduce(state, action))
+  update({ logo: 'my value' })(dispatch, () => state)
+  t.is(logoValue(state, 'logo'), 'my value')
+  t.deepEqual(state.globals.fields.logo, { value: 'my value' })
 })

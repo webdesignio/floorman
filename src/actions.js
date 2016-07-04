@@ -4,32 +4,33 @@ import { parse } from 'url'
 import 'whatwg-fetch'
 
 import {
-  globals,
-  recordData,
+  globalFields,
   currentLanguage,
-  noLangFields
+  localFields,
+  localNoLangFields,
+  globalNoLangFields
 } from './selectors'
 
-export const UPDATE_RECORD = 'UPDATE_RECORD'
-export const UPDATE_GLOBALS = 'UPDATE_GLOBALS'
+export const UPDATE_LOCAL_FIELDS = 'UPDATE_LOCAL_FIELDS'
+export const UPDATE_GLOBAL_FIELDS = 'UPDATE_GLOBAL_FIELDS'
 export const SET_EDITABLE = 'SET_EDITABLE'
 export const SAVE = 'SAVE'
 export const SAVE_SUCCESS = 'SAVE_SUCCESS'
 export const SAVE_FAILURE = 'SAVE_FAILURE'
 export const SWITCH_LANGUAGE = 'SWITCH_LANGUAGE'
 
-export function updateRecord (update) {
-  return { type: UPDATE_RECORD, update }
+export function updateLocalFields (update) {
+  return { type: UPDATE_LOCAL_FIELDS, update }
 }
 
-export function updateGlobals (update) {
-  return { type: UPDATE_GLOBALS, update }
+export function updateGlobalFields (update) {
+  return { type: UPDATE_GLOBAL_FIELDS, update }
 }
 
 export function update (update) {
   return (dispatch, getState) => {
     const state = getState()
-    const globalKeys = Object.keys(globals(state))
+    const globalKeys = Object.keys(globalFields(state))
     const updates = Object.keys(update)
       .map(key =>
         globalKeys.indexOf(key) !== -1
@@ -54,18 +55,18 @@ export function update (update) {
     if (updates.local) {
       const opts = {
         currentLanguage: currentLanguage(state),
-        fields: recordData(state),
-        noLangFields: noLangFields(state)
+        fields: localFields(state),
+        noLangFields: localNoLangFields(state)
       }
-      dispatch(updateRecord(spreadToLanguage(opts, updates.local)))
+      dispatch(updateLocalFields(spreadToLanguage(opts, updates.local)))
     }
     if (updates.global) {
       const opts = {
         currentLanguage: currentLanguage(state),
-        fields: globals(state),
-        noLangFields: noLangFields(state)
+        fields: globalFields(state),
+        noLangFields: globalNoLangFields(state)
       }
-      dispatch(updateGlobals(spreadToLanguage(opts, updates.global)))
+      dispatch(updateGlobalFields(spreadToLanguage(opts, updates.global)))
     }
   }
 }
@@ -116,8 +117,8 @@ export function save () {
   }
 }
 
-export function saveSuccess (record) {
-  return { type: SAVE_SUCCESS, record }
+export function saveSuccess (fields) {
+  return { type: SAVE_SUCCESS, fields }
 }
 
 export function saveFailure () {

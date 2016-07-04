@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux'
 
 import {
-  UPDATE_RECORD,
-  UPDATE_GLOBALS,
+  UPDATE_LOCAL_FIELDS,
+  UPDATE_GLOBAL_FIELDS,
   SET_EDITABLE,
   SAVE,
   SAVE_SUCCESS,
@@ -11,8 +11,7 @@ import {
 } from './actions'
 
 export default combineReducers({
-  originalRecord,
-  record,
+  locals,
   globals,
   noLangFields,
   languages,
@@ -22,22 +21,15 @@ export default combineReducers({
   isSaving
 })
 
-function originalRecord (state = null, action) {
+function locals (state = null, action) {
   switch (action.type) {
     case SAVE_SUCCESS:
-      return action.record
-    default:
-      return state
-  }
-}
-
-function record (state = null, action) {
-  switch (action.type) {
-    case SAVE_SUCCESS:
-      return action.record
-    case UPDATE_RECORD:
       return Object.assign({}, state, {
-        data: Object.assign({}, state.data, action.update)
+        fields: action.fields
+      })
+    case UPDATE_LOCAL_FIELDS:
+      return Object.assign({}, state, {
+        fields: Object.assign({}, state.fields, action.update)
       })
     default:
       return state
@@ -46,8 +38,10 @@ function record (state = null, action) {
 
 function globals (state = null, action) {
   switch (action.type) {
-    case UPDATE_GLOBALS:
-      return Object.assign({}, state, action.update)
+    case UPDATE_GLOBAL_FIELDS:
+      return Object.assign({}, state, {
+        fields: Object.assign({}, state.fields, action.update)
+      })
     default:
       return state
   }
