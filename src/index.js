@@ -4,10 +4,9 @@ import thunk from 'redux-thunk'
 import reduce from './reducers'
 
 export function createStore (initialState) {
-  const { record } = initialState
   const store = createReduxStore(
     reduce,
-    Object.assign({}, initialState, { originalRecord: record }),
+    initialState,
     applyMiddleware(thunk)
   )
   return store
