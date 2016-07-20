@@ -95,8 +95,8 @@ export function save () {
   return { type: SAVE }
 }
 
-export function saveSuccess (fields) {
-  return { type: SAVE_SUCCESS, fields }
+export function saveSuccess () {
+  return { type: SAVE_SUCCESS }
 }
 
 export function saveFailure () {

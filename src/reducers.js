@@ -23,10 +23,6 @@ export default combineReducers({
 
 function locals (state = null, action) {
   switch (action.type) {
-    case SAVE_SUCCESS:
-      return Object.assign({}, state, {
-        fields: action.fields
-      })
     case UPDATE_LOCAL_FIELDS:
       return Object.assign({}, state, {
         fields: Object.assign({}, state.fields, action.update)
