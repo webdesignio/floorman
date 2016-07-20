@@ -1,16 +1,4 @@
-import { createStore as createReduxStore, applyMiddleware } from 'redux'
-import thunk from 'redux-thunk'
-
-import reduce from './reducers'
-
-export function createStore (initialState) {
-  const store = createReduxStore(
-    reduce,
-    initialState,
-    applyMiddleware(thunk)
-  )
-  return store
-}
+import { createStore } from 'redux'
 
 export function findAll (components) {
   const slice = Array.prototype.slice
@@ -34,8 +22,8 @@ export function renderAll (components, props) {
   )
 }
 
-export function findAndRender (components, opts) {
-  const store = createStore(opts)
+export function findAndRender (components, ... args) {
+  const store = createStore(... args)
   renderAll(findAll(components), { store })
   return store
 }
