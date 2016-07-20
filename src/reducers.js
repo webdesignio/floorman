@@ -13,7 +13,6 @@ import {
 export default combineReducers({
   locals,
   globals,
-  noLangFields,
   languages,
   defaultLanguage,
   currentLanguage,
@@ -38,13 +37,6 @@ function globals (state = null, action) {
       return Object.assign({}, state, {
         fields: Object.assign({}, state.fields, action.update)
       })
-    default:
-      return state
-  }
-}
-
-function noLangFields (state = [], action) {
-  switch (action.type) {
     default:
       return state
   }

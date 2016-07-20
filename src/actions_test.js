@@ -111,14 +111,12 @@ test('reflects the saving state', t => {
     isSaving: false,
     locals: {}
   }
-  const record = { data: { _new: 1 } }
   const savingState = reduce(state, { type: SAVE })
   t.is(isSaving(savingState), true)
   const failureState = reduce(savingState, saveFailure())
   t.is(isSaving(failureState), false)
-  const successState = reduce(savingState, saveSuccess(record.data))
+  const successState = reduce(savingState, saveSuccess())
   t.is(isSaving(successState), false)
-  t.is(localFields(successState), record.data)
 })
 
 test('switches the language', t => {
