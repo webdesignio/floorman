@@ -8,9 +8,6 @@ import {
   updateGlobalFields,
   update,
   setEditable,
-  SAVE,
-  saveFailure,
-  saveSuccess,
   switchLanguage
 } from './actions'
 import {
@@ -18,10 +15,14 @@ import {
   localFields,
   globalFields,
   isEditable,
-  isSaving,
   currentLanguage,
   languages
 } from './selectors'
+
+test('leaves unchanged state untouched', t => {
+  const state = reduce(undefined, {})
+  t.is(reduce(state, {}), state)
+})
 
 test('updates local data', t => {
   const titleValue = createValueSelector()
@@ -104,19 +105,6 @@ test('toggles the editable flag', t => {
   }
   const newState = reduce(state, setEditable(true))
   t.is(isEditable(newState), true)
-})
-
-test('reflects the saving state', t => {
-  const state = {
-    isSaving: false,
-    locals: {}
-  }
-  const savingState = reduce(state, { type: SAVE })
-  t.is(isSaving(savingState), true)
-  const failureState = reduce(savingState, saveFailure())
-  t.is(isSaving(failureState), false)
-  const successState = reduce(savingState, saveSuccess())
-  t.is(isSaving(successState), false)
 })
 
 test('switches the language', t => {

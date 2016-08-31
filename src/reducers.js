@@ -4,21 +4,34 @@ import {
   UPDATE_LOCAL_FIELDS,
   UPDATE_GLOBAL_FIELDS,
   SET_EDITABLE,
-  SAVE,
-  SAVE_SUCCESS,
-  SAVE_FAILURE,
   SWITCH_LANGUAGE
 } from './actions'
 
-export default combineReducers({
+const reducers = {
   locals,
   globals,
   languages,
   defaultLanguage,
   currentLanguage,
-  isEditable,
-  isSaving
-})
+  isEditable
+}
+
+export default function reduce (state = {}, action) {
+  const { nextState, hasChanged } = Object.keys(reducers)
+    .reduce(
+      ({ nextState, hasChanged }, key) => {
+        const value = reducers[key](nextState[key], action)
+        return {
+          nextState: Object.assign({}, nextState, { [key]: value }),
+          hasChanged: hasChanged || (value !== nextState[key])
+        }
+      },
+      { nextState: state, hasChanged: false }
+    )
+  return (
+    hasChanged ? nextState : state
+  )
+}
 
 function locals (state = null, action) {
   switch (action.type) {
@@ -69,18 +82,6 @@ function isEditable (state = true, action) {
   switch (action.type) {
     case SET_EDITABLE:
       return action.value
-    default:
-      return state
-  }
-}
-
-function isSaving (state = false, action) {
-  switch (action.type) {
-    case SAVE:
-      return true
-    case SAVE_SUCCESS:
-    case SAVE_FAILURE:
-      return false
     default:
       return state
   }
