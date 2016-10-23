@@ -1,5 +1,3 @@
-import { combineReducers } from 'redux'
-
 import {
   UPDATE_LOCAL_FIELDS,
   UPDATE_GLOBAL_FIELDS,
@@ -15,6 +13,8 @@ const reducers = {
   currentLanguage,
   isEditable
 }
+
+export { reducers as map }
 
 export default function reduce (state = {}, action) {
   const { nextState, hasChanged } = Object.keys(reducers)
